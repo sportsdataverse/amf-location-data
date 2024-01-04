@@ -111,7 +111,9 @@ def get_list_of_statsbomb_games():
     return df
 
 
-def parse_statsbomb_amf_tracking_data(json_data: dict):
+def parse_statsbomb_amf_tracking_data(
+        json_data: dict
+    ):
     """ """
     tracking_df = pd.DataFrame()
     row_df = pd.DataFrame()

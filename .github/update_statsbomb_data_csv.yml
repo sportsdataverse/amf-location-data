@@ -1,12 +1,12 @@
-name: Update Statsbomb Data
+name: Update Statsbomb Data - CSV
 on:
   schedule:
-    # - cron: "30 7 * 4-10 *"
-    - cron: "0 0 30 12 1"
+    - cron: "59 7 * * 0"
+    #- cron: "0 0 30 12 1"
   # push:
   #   branches: [main]
-  # pull_request:
-  #   branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
   build:
@@ -34,15 +34,15 @@ jobs:
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
       - name: run Python Script
         run: |
-          python check_data_advalibility.py
+          python check_data_advalibility.py -csv
 
       - uses: xresloader/upload-to-github-release@main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          file: "game_stats/player/*.csv"
+          file: "statsbomb/*"
           branches: "main"
           #update_latest_release: true
           overwrite: true
           verbose: true
-          default_release_name: "MiLB_Game_Player_Stats"
+          default_release_name: "Tracking Data - CSV"
