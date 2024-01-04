@@ -282,12 +282,20 @@ def parse_statsbomb_amf_tracking_data(
         ["game_id", "track_id", "gsis_play_id"]
     )["y"].shift(5)
 
+
     tracking_df["time_since_last_frame"] = tracking_df[
         "time_since_snap"
     ] - tracking_df.groupby(["game_id", "track_id", "gsis_play_id"])[
         "time_since_snap"
     ].shift(
         1
+    )
+    tracking_df["speed_ref_time"] = tracking_df[
+        "time_since_snap"
+    ] - tracking_df.groupby(["game_id", "track_id", "gsis_play_id"])[
+        "time_since_snap"
+    ].shift(
+        5
     )
 
     # Same as the `[dis]` column in the BDB dataset.
@@ -297,17 +305,26 @@ def parse_statsbomb_amf_tracking_data(
         ),
         axis=1,
     )
+    tracking_df["speed_ref_dist"] = tracking_df.apply(
+        lambda x: get_distance_from_two_points(
+            x["x_lag_5"], x["y_lag_5"], x["x"], x["y"]
+        ),
+        axis=1,
+    )
 
     # Same as the `[s]` column in the BDB dataset.
     # yds/s
     tracking_df["player_speed"] = (
-        tracking_df["player_distance"] / tracking_df["time_since_last_frame"]
+        tracking_df["speed_ref_dist"] / tracking_df["speed_ref_time"]
     )
 
     # Same as the `[a]` column in the BDB dataset.
     # yds/s^2
+    tracking_df["player_speed_lag_1"] = tracking_df.groupby(
+        ["game_id", "track_id", "gsis_play_id"]
+    )["player_speed"].shift(1)
     tracking_df["player_acceleration"] = (
-        tracking_df["player_speed"] / tracking_df["time_since_last_frame"]
+        (tracking_df["player_speed"] - tracking_df["player_speed_lag_1"]) / tracking_df["time_since_last_frame"]
     )
 
     # Same as the `[o]` column in the BDB dataset.
@@ -357,11 +374,11 @@ def get_statsbomb_tracking_data(season: int):
 
         game_df.to_csv(f"statsbomb/{game_id}.csv", index=False)
         game_df.to_parquet(f"statsbomb/{game_id}.parquet", index=False)
-
+        del game_df
     return tracking_df
 
 
 if __name__ == "__main__":
     print("starting up")
-    for i in range(2022, 2024):
+    for i in range(2020, 2024):
         get_statsbomb_tracking_data(i)
