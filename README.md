@@ -66,4 +66,4 @@ Here is a full list of columns that can be found in either a `.csv` or `.parquet
 
 ## Other Notes
 
-The usage of this data is still bound by the (StatsBomb Public Data User Agreement)[https://github.com/statsbomb/amf-open-data/blob/main/LICENSE.pdf]. Please ensure that the usage of data from this and the [`statsbomb/amf-open-data`](https://github.com/statsbomb/amf-open-data) GitHub repositories follows this User Agreement.
+The usage of this data is still bound by the [StatsBomb Public Data User Agreement](https://github.com/statsbomb/amf-open-data/blob/main/LICENSE.pdf). Please ensure that the usage of data from this and the [`statsbomb/amf-open-data`](https://github.com/statsbomb/amf-open-data) GitHub repositories follows this User Agreement.
