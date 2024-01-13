@@ -111,9 +111,7 @@ def get_list_of_statsbomb_games():
     return df
 
 
-def parse_statsbomb_amf_tracking_data(
-        json_data: dict
-    ):
+def parse_statsbomb_amf_tracking_data(json_data: dict):
     """ """
     tracking_df = pd.DataFrame()
     row_df = pd.DataFrame()
@@ -200,8 +198,18 @@ def parse_statsbomb_amf_tracking_data(
 
         for player in play["tracks"]:
             track_id = player["track_id"]
-            player_start_timestamp = player["start_timestamp"]
-            player_end_timestamp = player["end_timestamp"]
+            try:
+                player_start_timestamp = player["start_timestamp"]
+            except Exception as e:
+                logging.info(e)
+                player_start_timestamp = None
+
+            try:
+                player_end_timestamp = player["end_timestamp"]
+            except Exception as e:
+                logging.info(e)
+                play_end_timestamp = None
+
             team_id = player["team_id"]
             nfl_team_id = player["nfl_team_id"]
             player_id = player["player"]["player_id"]
@@ -255,7 +263,10 @@ def parse_statsbomb_amf_tracking_data(
         del game_clock, play_yardline, offense_left_to_right
         del player_coverage_count, calibration_fault_ratio
 
-    logging.info(f"Applying NFL BDB-like columns to the tracking data in game ID #{game_id}")
+    logging.info(
+        "Applying NFL BDB-like columns to the tracking data in "+
+        f"game ID #{game_id}"
+    )
     tracking_df["season"] = season
     tracking_df["season_id"] = season_id
     tracking_df["season_name"] = season_name
@@ -281,7 +292,6 @@ def parse_statsbomb_amf_tracking_data(
     tracking_df["y_lag_5"] = tracking_df.groupby(
         ["game_id", "track_id", "gsis_play_id"]
     )["y"].shift(5)
-
 
     tracking_df["time_since_last_frame"] = tracking_df[
         "time_since_snap"
@@ -324,8 +334,8 @@ def parse_statsbomb_amf_tracking_data(
         ["game_id", "track_id", "gsis_play_id"]
     )["player_speed"].shift(1)
     tracking_df["player_acceleration"] = (
-        (tracking_df["player_speed"] - tracking_df["player_speed_lag_1"]) / tracking_df["time_since_last_frame"]
-    )
+        tracking_df["player_speed"] - tracking_df["player_speed_lag_1"]
+    ) / tracking_df["time_since_last_frame"]
 
     # Same as the `[o]` column in the BDB dataset.
     # 5
@@ -380,5 +390,7 @@ def get_statsbomb_tracking_data(season: int):
 
 if __name__ == "__main__":
     print("starting up")
-    for i in range(2020, 2024):
+    for i in range(2019, 2024):
         get_statsbomb_tracking_data(i)
+
+    # get_statsbomb_tracking_data(2019)
