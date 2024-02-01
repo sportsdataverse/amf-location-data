@@ -1,10 +1,10 @@
 name: Update Statsbomb Data - CSV
 on:
   schedule:
-    - cron: "59 7 * * 0"
+    - cron: "59 7 * * *"
     #- cron: "0 0 30 12 1"
-  # push:
-  #   branches: [main]
+  push:
+    branches: [main]
   pull_request:
     branches: [main]
 

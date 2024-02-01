@@ -390,7 +390,7 @@ def get_statsbomb_tracking_data(season: int):
 
 if __name__ == "__main__":
     print("starting up")
-    for i in range(2019, 2024):
+    for i in range(2018, 2024):
         get_statsbomb_tracking_data(i)
 
     # get_statsbomb_tracking_data(2019)
