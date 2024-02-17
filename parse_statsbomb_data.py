@@ -42,7 +42,11 @@ def get_distance_from_two_points(
 def get_json_from_web_gz(url: str):
     """ """
     headers = {
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36"
+        "User-Agent": """
+        Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4)
+        AppleWebKit/537.36 (KHTML, like Gecko)
+        Chrome/83.0.4103.97 Safari/537.36
+        """.replace("        M", "M").replace("        ", " ")
     }
     logging.info(f"Getting data from url `{url}`")
     logging.info("Attempting to download data and hold the data in memory.")
@@ -52,13 +56,17 @@ def get_json_from_web_gz(url: str):
         logging.info("Data loaded successfully.")
     else:
         logging.critical(
-            f"Failed to download the data from the specified url. HTTP status code {response.status_code}."
+            "Failed to download the data from the specified url. " +
+            f"HTTP status code {response.status_code}."
         )
         raise ConnectionError(
-            f"Failed to download the data from the specified url. HTTP status code {response.status_code}."
+            "Failed to download the data from the specified url. " +
+            f"HTTP status code {response.status_code}."
         )
 
-    logging.info("Attempting to decompress the `.gz` file that was downloaded.")
+    logging.info(
+        "Attempting to decompress the `.gz` file that was downloaded."
+    )
 
     try:
         json_string = decompress(response.content)
@@ -84,10 +92,15 @@ def get_list_of_statsbomb_games():
         seasons[f"{i}/{i+1}"] = i
 
     headers = {
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36"
+        "User-Agent": """
+        Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4)
+        AppleWebKit/537.36 (KHTML, like Gecko)
+        Chrome/83.0.4103.97 Safari/537.36
+        """.replace("        M", "M").replace("        ", " ")
     }
     url = (
-        "https://raw.githubusercontent.com/statsbomb/amf-open-data/main/data/games.json"
+        "https://raw.githubusercontent.com/" +
+        "statsbomb/amf-open-data/main/data/games.json"
     )
 
     response = requests.get(url, headers=headers)
@@ -264,7 +277,7 @@ def parse_statsbomb_amf_tracking_data(json_data: dict):
         del player_coverage_count, calibration_fault_ratio
 
     logging.info(
-        "Applying NFL BDB-like columns to the tracking data in "+
+        "Applying NFL BDB-like columns to the tracking data in " +
         f"game ID #{game_id}"
     )
     tracking_df["season"] = season
@@ -278,7 +291,7 @@ def parse_statsbomb_amf_tracking_data(json_data: dict):
     tracking_df["game_date"] = game_date
     tracking_df["tracking_framerate"] = tracking_framerate
 
-    ## Calculate orientation and direction.
+    # Calculate orientation and direction.
     tracking_df["x_lag_1"] = tracking_df.groupby(
         ["game_id", "track_id", "gsis_play_id"]
     )["x"].shift(1)
@@ -340,14 +353,24 @@ def parse_statsbomb_amf_tracking_data(json_data: dict):
     # Same as the `[o]` column in the BDB dataset.
     # 5
     tracking_df["player_orientation"] = tracking_df.apply(
-        lambda x: get_angle_from_two_points(x["x_lag_5"], x["y_lag_5"], x["x"], x["y"]),
+        lambda x: get_angle_from_two_points(
+            x["x_lag_5"],
+            x["y_lag_5"],
+            x["x"],
+            x["y"]
+        ),
         axis=1,
     )
 
     # Same as the `[dir]` column in the BDB dataset.
     # 1
     tracking_df["player_direction"] = tracking_df.apply(
-        lambda x: get_angle_from_two_points(x["x_lag_1"], x["y_lag_1"], x["x"], x["y"]),
+        lambda x: get_angle_from_two_points(
+            x["x_lag_1"],
+            x["y_lag_1"],
+            x["x"],
+            x["y"]
+        ),
         axis=1,
     )
 
