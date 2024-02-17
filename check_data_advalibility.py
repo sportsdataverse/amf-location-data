@@ -19,13 +19,14 @@ from parse_statsbomb_data import (
 
 
 def check_data_advalibility(
-    check_csv: bool = False, 
-    check_parquet: bool = False, 
+    check_csv: bool = False,
+    check_parquet: bool = False,
     check_all_seasons: bool = True
 ):
     if check_csv is False and check_parquet is False:
         raise ValueError(
-            "Please specify if you want to check the `.csv` files, or the `.parquet` files."
+            "Please specify if you want to check the `.csv` files" +
+            ", or the `.parquet` files."
         )
 
     games_df = get_list_of_statsbomb_games()
@@ -33,7 +34,7 @@ def check_data_advalibility(
     if check_all_seasons is False:
         seasons_arr = games_df["season"].to_numpy()
         seasons_arr = np.unique(seasons_arr)
-        s_len = len(seasons_arr)
+        s_len = len(seasons_arr)-1
         s = seasons_arr[randint(0, s_len)]
         games_df = games_df[games_df["season"] == s]
 
@@ -49,7 +50,9 @@ def check_data_advalibility(
         if check_csv is True:
             try:
                 df = pd.read_csv(
-                    f"https://github.com/sportsdataverse/amf-location-data/releases/download/amf_tracking_csv/{game_id}.csv"
+                    "https://github.com/sportsdataverse/" +
+                    "amf-location-data/releases/download/" +
+                    f"amf_tracking_csv/{game_id}.csv"
                 )
                 print(df)
                 print(f"\n{game_id} is verified to to exist in `.csv` form.")
@@ -68,10 +71,14 @@ def check_data_advalibility(
         elif check_parquet is True:
             try:
                 df = pd.read_parquet(
-                    f"https://github.com/sportsdataverse/amf-location-data/releases/download/amf_tracking_parquet/{game_id}.parquet"
+                    "https://github.com/sportsdataverse/" +
+                    "amf-location-data/releases/download/" +
+                    f"amf_tracking_parquet/{game_id}.parquet"
                 )
                 print(df)
-                print(f"\n{game_id} is verified to to exist in `.parquet` form.")
+                print(
+                    f"\n{game_id} is verified to to exist in `.parquet` form."
+                )
 
             except Exception as e:
                 logging.warning(
@@ -81,7 +88,10 @@ def check_data_advalibility(
                 logging.info("Attempting to re-download this game.")
                 json_data = get_json_from_web_gz(game_url)
                 parsed_df = parse_statsbomb_amf_tracking_data(json_data)
-                parsed_df.to_parquet(f"statsbomb/{game_id}.parquet", index=False)
+                parsed_df.to_parquet(
+                    f"statsbomb/{game_id}.parquet",
+                    index=False
+                )
 
         del game_id, game_url
 
@@ -109,12 +119,19 @@ if __name__ == "__main__":
 
     if csv_flag is True and parquet_flag is True:
         raise ValueError(
-            "Please specify if you want to check the `.csv` files, or the `.parquet` files."
+            "Please specify if you want to check the `.csv` " +
+            "files, or the `.parquet` files."
         )
     elif csv_flag is True:
-        check_data_advalibility(check_csv=True, check_all_seasons=check_all_seasons)
+        check_data_advalibility(
+            check_csv=True,
+            check_all_seasons=check_all_seasons
+        )
     elif parquet_flag is True:
-        check_data_advalibility(check_parquet=True, check_all_seasons=check_all_seasons)
+        check_data_advalibility(
+            check_parquet=True,
+            check_all_seasons=check_all_seasons
+        )
 
     timestamp_json = {
         "last_check": {"month": now.month, "day": now.day, "year": now.year},
