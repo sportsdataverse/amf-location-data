@@ -41,12 +41,11 @@ def get_distance_from_two_points(
 
 def get_json_from_web_gz(url: str):
     """ """
+    user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) " + \
+        "AppleWebKit/537.36 (KHTML, like Gecko) " + \
+        "Chrome/83.0.4103.97 Safari/537.36"
     headers = {
-        "User-Agent": """
-        Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4)
-        AppleWebKit/537.36 (KHTML, like Gecko)
-        Chrome/83.0.4103.97 Safari/537.36
-        """.replace("        M", "M").replace("        ", " ")
+        "User-Agent": user_agent
     }
     logging.info(f"Getting data from url `{url}`")
     logging.info("Attempting to download data and hold the data in memory.")
@@ -90,13 +89,11 @@ def get_list_of_statsbomb_games():
         # it would look like this:
         # seasons["2000/2001"] = 2000
         seasons[f"{i}/{i+1}"] = i
-
+    user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) " + \
+        "AppleWebKit/537.36 (KHTML, like Gecko) " + \
+        "Chrome/83.0.4103.97 Safari/537.36"
     headers = {
-        "User-Agent": """
-        Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4)
-        AppleWebKit/537.36 (KHTML, like Gecko)
-        Chrome/83.0.4103.97 Safari/537.36
-        """.replace("        M", "M").replace("        ", " ")
+        "User-Agent": user_agent
     }
     url = (
         "https://raw.githubusercontent.com/" +
